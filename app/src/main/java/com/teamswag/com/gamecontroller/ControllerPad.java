@@ -1,5 +1,10 @@
 package com.teamswag.com.gamecontroller;
 
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -20,7 +25,8 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 
 public class ControllerPad extends Activity {
     /** Called when the activity is first created. */
-
+    public static final String SERVERIP = "192.168.1.147";
+    public static final int SERVERPORT = 7777;
     private final static UUID PEBBLE_APP_UUID = UUID.fromString("6de63fbf-aae8-4d4d-912e-2697d344ebd3");
     private final int BATCH_SIZE = 10;
     private Handler handler;
@@ -30,13 +36,13 @@ public class ControllerPad extends Activity {
     private int bgcolor;
     private String canvasText;
     private boolean notCalibrating;
+    private Thread lThread;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new MyView(this);
         setContentView(view);
-//      connected = PebbleKit.isWatchConnected(getApplicationContext());
         PebbleKit.startAppOnPebble(getApplicationContext(), PEBBLE_APP_UUID);
 
         notCalibrating = true;
@@ -57,9 +63,6 @@ public class ControllerPad extends Activity {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
                 PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
-                //Log.i(getLocalClassName(), "Received value " + data.getInteger(0) + " for x");
-                //Log.i(getLocalClassName(), "Received value " + data.getInteger(1) + " for y");
-                //Log.i(getLocalClassName(), "Received value " + data.getInteger(2) + " for z");
 
                 handler.post(new Runnable() {
                     @Override
@@ -113,7 +116,8 @@ public class ControllerPad extends Activity {
     }
 
     private void startGestureListener(long[] gravityVector, long[] rightVector, long[] upVector){
-
+        lThread = new GestureListenerThread(650, gravityVector, rightVector, upVector);
+        lThread.start();
     }
 
     public long[] crossLV(long[] vector1, long[] vector2){
@@ -121,6 +125,21 @@ public class ControllerPad extends Activity {
         retu[0] = (long)(vector1[1]*vector2[2]-vector1[2]*vector2[1]);
         retu[1] = (long)(vector1[2]*vector2[0]-vector1[0]*vector2[2]);
         retu[2] = (long)(vector1[0]*vector2[2]-vector1[2]*vector2[0]);
+        return retu;
+    }
+
+    public double dotProductLV(long[] vector1, double[] vector2){
+        return vector1[0]*vector2[0]+vector1[1]*vector2[1]+vector1[2]*vector2[2];
+    }
+
+    public double[] normalizeLV(long[] vector){
+        double retu[] = {0,0,0};
+        double length = accelerationVectorLength(vector[0], vector[1], vector[2]);
+        if(length != 0){
+            retu[0] = (double)(vector[0]/length);
+            retu[1] = (double)(vector[1]/length);
+            retu[2] = (double)(vector[2]/length);
+        }
         return retu;
     }
 
@@ -312,20 +331,53 @@ public class ControllerPad extends Activity {
     public class GestureListenerThread extends Thread {
         private int tolerance;
         private long[] gravityVector;
-        private long[] rightVector;
-        private long[] upVector;
-        private long[] forwardVector;
+        private double[] rightVector;
+        private double[] upVector;
+        private double[] forwardVector;
+        private ArrayList<long[]> events;
 
         public GestureListenerThread(int tolerance, long[] gravityVector, long[] rightVector, long[] upVector) {
             this.tolerance = tolerance;
             this.gravityVector = gravityVector;
-            this.rightVector = rightVector;
-            this.upVector = upVector;
-            forwardVector = crossLV( upVector, rightVector);
+            this.rightVector = normalizeLV(rightVector);
+            this.upVector = normalizeLV(upVector);
+            this.forwardVector = normalizeLV(crossLV(upVector, rightVector));
+            alertConsole(this.upVector[0] +"," + this.upVector[1] + "," + this.upVector[2]);
         }
 
         public void run() {
+            try {
+                InetAddress serverAddr = InetAddress.getByName(SERVERIP);
+                alertConsole("\nStart connecting\n");
+                DatagramSocket socket = new DatagramSocket();
+                byte[] buf = {0};
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, SERVERPORT);
+                alertConsole("Sending ‘" + new String(buf) + "’ to " + SERVERIP + ":" + SERVERPORT + "\n");
+                alertConsole("Messages sending!\n");
+                while (true) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                    }
+                    long vector[] = {0, 0, 0};
+                    vector[0] = accelData[0] - gravityVector[0];
+                    vector[1] = accelData[1] - gravityVector[1];
+                    vector[2] = accelData[2] - gravityVector[2];
+                    double d = Math.abs(dotProductLV(vector, upVector));
 
+
+                    if (d > tolerance) {
+                        buf = new byte[]{1};
+                        alertConsole("WERE MINING BITCHCOINZ  " + d);
+                    }else {
+                        buf = new byte[]{0};
+                    }
+                    packet = new DatagramPacket(buf, buf.length, serverAddr, SERVERPORT);
+                    socket.send(packet);
+                }
+            }catch (Exception e) {
+                //updatetrack("Error!\n");
+            }
         }
     }
 

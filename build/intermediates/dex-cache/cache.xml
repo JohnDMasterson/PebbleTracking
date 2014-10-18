@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/pre-dexed/debug/guava-14.0.1-82e11e1da6bd86cf79c1ca93cbee569bc8fca6d0.jar"
+        jar="/Users/john/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/14.0.1/69e12f4c6aeac392555f1ea86fab82b5e5e31ad4/guava-14.0.1.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="69e12f4c6aeac392555f1ea86fab82b5e5e31ad4"/>
+    <item
+        dex="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-8af08647421fcc33315d39566c576ccb496301c3.jar"
+        jar="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
+    <item
+        dex="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/pre-dexed/debug/classes-5cc52983d1093e58e484dc712a2c085a8709b6eb.jar"
+        jar="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
+    <item
+        dex="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-bca9cd8c8082330ef7549e0398af852faae531fd.jar"
+        jar="/Applications/Android Studio.app/sdk/extras/android/m2repository/com/android/support/support-annotations/20.0.0/support-annotations-20.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa"/>
+    <item
+        dex="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/pre-dexed/debug/classes-f74b3dd5b4b6862690b8c97b3e76f842ad4b347f.jar"
+        jar="/Users/john/AndroidStudioProjects/GameController/app/build/intermediates/exploded-aar/com.getpebble/pebblekit/2.5.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="fcd447344b983fe2b2aef2f7c7c960451234cca9"/>
+
+</pre-dex-items>
